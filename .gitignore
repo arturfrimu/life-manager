@@ -139,3 +139,4 @@ vite.config.ts.timestamp-*
 
 .idea
 /target
+/.vscode/settings.json
