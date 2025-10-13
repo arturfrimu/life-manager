@@ -9,7 +9,9 @@ import io.minio.PutObjectArgs;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -59,15 +61,10 @@ public class ErrorEventStorage {
     }
 
     @Recover
-    public void recoverFromMinioFailure(Exception e, ErrorEvent errorEvent) {
+    public void recoverFromMinioFailure(Exception e, ErrorEvent errorEvent) throws Exception {
         log.warn("Failed to save error event to MinIO after retries, falling back to file storage: {}", e.getMessage());
-        
-        try {
-            fileErrorStorage.saveErrorToFile(errorEvent);
-            log.info("Successfully saved error event to file storage as fallback");
-        } catch (Exception fileException) {
-            log.error("Failed to save error event to both MinIO and file storage", fileException);
-        }
+        fileErrorStorage.saveErrorToFile(errorEvent);
+        log.info("Successfully saved error event to file storage as fallback");
     }
 
     @Retryable(

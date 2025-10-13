@@ -5,7 +5,9 @@ import com.arturfrimu.lifemanager.error.service.ErrorEventStorage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -24,6 +26,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GlobalExceptionHandler {
+
+    @NonFinal
+    @Value("${spring.application.name:life-manager}")
+    private String APP_NAME;
 
     ErrorEventStorage errorEventStorage;
 
@@ -102,7 +108,7 @@ public class GlobalExceptionHandler {
             
             var errorEvent = ErrorEvent.create(
                     eventType,
-                    "life-manager",
+                    APP_NAME,
                     ex.getMessage() != null ? ex.getMessage() : "No message available",
                     details
             );
