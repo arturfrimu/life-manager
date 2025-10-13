@@ -17,4 +17,6 @@ public interface ExerciseRepositoryPort {
     Page<Exercise> findAll(Pageable pageable);
 
     void deleteById(UUID id);
+
+    Exercise update(Exercise exercise);
 }

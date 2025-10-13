@@ -4,6 +4,9 @@ import com.arturfrimu.lifemanager.sport.enums.Type;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
 
@@ -12,6 +15,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Audited
+@AuditOverride(forClass = BaseEntity.class)
 @Entity
 @Table(name = "exercise", schema = "life_manager")
 public class ExerciseEntity extends BaseEntity {

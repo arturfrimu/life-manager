@@ -15,7 +15,6 @@ create table life_manager_history.exercise_history
     id            uuid                     not null,
     created       timestamp with time zone not null,
     updated       timestamp with time zone not null,
-    active        boolean                  not null,
     name          varchar(128)             not null,
     type          varchar(64),
     description   text,

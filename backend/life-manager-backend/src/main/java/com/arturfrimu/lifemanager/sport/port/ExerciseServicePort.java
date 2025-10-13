@@ -15,4 +15,6 @@ public interface ExerciseServicePort {
     Page<Exercise> findAllExercises(Pageable pageable);
 
     void deleteExercise(UUID id);
+
+    Exercise updateExercise(UUID id, String name, Type type, String description);
 }

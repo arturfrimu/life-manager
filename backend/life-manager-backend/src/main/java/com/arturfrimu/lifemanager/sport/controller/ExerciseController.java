@@ -3,6 +3,7 @@ package com.arturfrimu.lifemanager.sport.controller;
 import com.arturfrimu.lifemanager.sport.dto.CreateExerciseRequest;
 import com.arturfrimu.lifemanager.sport.dto.ExercisePageResponse;
 import com.arturfrimu.lifemanager.sport.dto.ExerciseResponse;
+import com.arturfrimu.lifemanager.sport.dto.UpdateExerciseRequest;
 import com.arturfrimu.lifemanager.sport.mapper.ExerciseMapper;
 import com.arturfrimu.lifemanager.sport.port.ExerciseServicePort;
 import jakarta.validation.Valid;
@@ -74,5 +75,25 @@ public class ExerciseController {
         
         log.info("Successfully deleted exercise with id: {}", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ExerciseResponse> updateExercise(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateExerciseRequest request
+    ) {
+        log.info("Received request to update exercise with id: {}", id);
+        
+        var exercise = exerciseServicePort.updateExercise(
+                id,
+                request.name(),
+                request.type(),
+                request.description()
+        );
+        
+        var response = exerciseMapper.toResponse(exercise);
+        
+        log.info("Successfully updated exercise with id: {}", exercise.id());
+        return ResponseEntity.ok(response);
     }
 }

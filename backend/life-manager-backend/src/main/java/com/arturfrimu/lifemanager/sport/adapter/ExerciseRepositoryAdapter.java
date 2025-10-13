@@ -50,4 +50,11 @@ public class ExerciseRepositoryAdapter implements ExerciseRepositoryPort {
     public void deleteById(UUID id) {
         jpaRepository.deleteById(id);
     }
+
+    @Override
+    public Exercise update(Exercise exercise) {
+        var entity = exerciseMapper.toEntity(exercise);
+        var savedEntity = jpaRepository.saveAndFlush(entity);
+        return exerciseMapper.toDomain(savedEntity);
+    }
 }

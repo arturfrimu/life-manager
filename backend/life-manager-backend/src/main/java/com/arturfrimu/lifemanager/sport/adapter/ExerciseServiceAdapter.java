@@ -78,4 +78,35 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         
         log.info("Successfully deleted exercise with id: {}", id);
     }
+
+    @Override
+    @Transactional
+    public Exercise updateExercise(UUID id, String name, Type type, String description) {
+        Preconditions.checkArgument(Objects.nonNull(id), "Id cannot be null");
+        Preconditions.checkArgument(Objects.nonNull(name), "Name cannot be null");
+        Preconditions.checkArgument(Objects.nonNull(type), "Type cannot be null");
+        
+        log.info("Updating exercise with id: {}", id);
+        
+        var existingExercise = exerciseRepositoryPort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Exercise with id '%s' not found".formatted(id)));
+        
+        if (!existingExercise.name().equals(name) && exerciseRepositoryPort.existsByName(name)) {
+            throw new IllegalArgumentException("Exercise with name '%s' already exists".formatted(name));
+        }
+        
+        var updatedExercise = new Exercise(
+                existingExercise.id(),
+                name,
+                type,
+                description,
+                existingExercise.created(),
+                java.time.Instant.now()
+        );
+        
+        var savedExercise = exerciseRepositoryPort.update(updatedExercise);
+        
+        log.info("Successfully updated exercise with id: {}", savedExercise.id());
+        return savedExercise;
+    }
 }
