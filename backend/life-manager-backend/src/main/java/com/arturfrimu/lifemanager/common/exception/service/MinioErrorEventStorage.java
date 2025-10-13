@@ -1,7 +1,7 @@
-package com.arturfrimu.lifemanager.common.error.service;
+package com.arturfrimu.lifemanager.common.exception.service;
 
 import com.arturfrimu.lifemanager.common.config.MinioProperties;
-import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.common.exception.domain.ErrorEvent;
 import com.arturfrimu.lifemanager.common.storage.MinioStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;

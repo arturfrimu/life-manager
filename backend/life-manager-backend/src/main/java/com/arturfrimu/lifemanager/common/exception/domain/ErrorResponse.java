@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.common.exception;
+package com.arturfrimu.lifemanager.common.exception.domain;
 
 import java.time.Instant;
 import java.util.Map;

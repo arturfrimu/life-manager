@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.common.error.domain;
+package com.arturfrimu.lifemanager.common.exception.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;

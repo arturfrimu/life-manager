@@ -1,7 +1,8 @@
-package com.arturfrimu.lifemanager.common.exception;
+package com.arturfrimu.lifemanager.common.exception.aspect;
 
-import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
-import com.arturfrimu.lifemanager.common.error.service.MinioErrorEventStorage;
+import com.arturfrimu.lifemanager.common.exception.utils.ExceptionDetailsIdentifierUtils;
+import com.arturfrimu.lifemanager.common.exception.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.common.exception.service.MinioErrorEventStorage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

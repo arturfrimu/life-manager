@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,20 +26,20 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     MinioProperties minioProperties;
 
     @Override
-    public String uploadFile(String folder, String filename, InputStream stream, long fileSize, String fileContentType) {
+    public String uploadFile(String folder, String filename, InputStream stream, long size, String fileContentType) {
         try {
-            String objectName = "%s/%s".formatted(folder, filename);
+            var objectName = "%s/%s".formatted(folder, filename);
 
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(minioProperties.getBucketName())
                             .object(objectName)
-                            .stream(stream, fileSize, -1)
+                            .stream(stream, size, -1)
                             .contentType(fileContentType)
                             .build()
             );
 
-            String fileUrl = getFileUrl(objectName);
+            var fileUrl = getFileUrl(objectName);
             log.info("Successfully uploaded file: {} to MinIO", objectName);
             return fileUrl;
         } catch (Exception e) {
@@ -53,18 +51,18 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     @Override
     public List<String> uploadFiles(String folder, List<MultipartFile> files) {
         List<String> uploadedFileUrls = new ArrayList<>();
-        
+
         for (MultipartFile file : files) {
-            String uniqueFilename = "%s_%s".formatted(UUID.randomUUID(), file.getOriginalFilename());
-            String fileUrl = null;
             try {
-                fileUrl = uploadFile(folder, uniqueFilename, new ByteArrayInputStream(file.getBytes()), file.getSize(), file.getContentType());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                var uniqueFilename = "%s_%s".formatted(UUID.randomUUID(), file.getOriginalFilename());
+                var fileUrl = uploadFile(folder, uniqueFilename, file.getInputStream(), file.getSize(), file.getContentType());
+                uploadedFileUrls.add(fileUrl);
+            } catch (Exception e) {
+                log.error("Failed to upload file: {}", file.getOriginalFilename(), e);
+                throw new RuntimeException("Failed to upload file to storage", e);
             }
-            uploadedFileUrls.add(fileUrl);
         }
-        
+
         log.info("Successfully uploaded {} files to MinIO", uploadedFileUrls.size());
         return uploadedFileUrls;
     }
@@ -87,10 +85,10 @@ public class MinioStorageServiceImpl implements MinioStorageService {
 
     @Override
     public String getFileUrl(String objectName) {
-        return String.format("%s/%s/%s",
-                minioProperties.getEndpoint(), 
-                minioProperties.getBucketName(), 
-                objectName);
+        return "%s/%s/%s".formatted(
+                minioProperties.getEndpoint(),
+                minioProperties.getBucketName(),
+                objectName
+        );
     }
 }
-

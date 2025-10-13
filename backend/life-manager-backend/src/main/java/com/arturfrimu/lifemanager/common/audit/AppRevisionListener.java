@@ -1,6 +1,5 @@
 package com.arturfrimu.lifemanager.common.audit;
 
-import com.arturfrimu.lifemanager.sport.entity.audit.RevInfoEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.envers.RevisionListener;

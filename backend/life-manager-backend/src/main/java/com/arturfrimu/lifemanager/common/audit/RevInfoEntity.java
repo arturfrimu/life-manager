@@ -1,6 +1,5 @@
-package com.arturfrimu.lifemanager.sport.entity.audit;
+package com.arturfrimu.lifemanager.common.audit;
 
-import com.arturfrimu.lifemanager.common.audit.AppRevisionListener;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

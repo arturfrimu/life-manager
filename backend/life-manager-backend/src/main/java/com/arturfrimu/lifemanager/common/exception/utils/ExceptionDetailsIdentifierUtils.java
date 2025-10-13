@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.common.exception;
+package com.arturfrimu.lifemanager.common.exception.utils;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.dao.DataAccessException;
