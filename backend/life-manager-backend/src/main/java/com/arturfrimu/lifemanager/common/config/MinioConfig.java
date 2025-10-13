@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.config;
+package com.arturfrimu.lifemanager.common.config;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;

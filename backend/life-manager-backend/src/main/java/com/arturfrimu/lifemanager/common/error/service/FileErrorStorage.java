@@ -1,7 +1,7 @@
-package com.arturfrimu.lifemanager.error.service;
+package com.arturfrimu.lifemanager.common.error.service;
 
-import com.arturfrimu.lifemanager.config.ErrorStorageProperties;
-import com.arturfrimu.lifemanager.error.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.common.config.ErrorStorageProperties;
+import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
@@ -15,7 +15,6 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

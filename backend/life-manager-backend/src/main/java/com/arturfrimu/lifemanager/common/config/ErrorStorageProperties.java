@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.config;
+package com.arturfrimu.lifemanager.common.config;
 
 import lombok.Getter;
 import lombok.Setter;

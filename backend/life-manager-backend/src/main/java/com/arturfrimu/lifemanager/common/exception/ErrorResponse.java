@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.sport.exception;
+package com.arturfrimu.lifemanager.common.exception;
 
 import java.time.Instant;
 import java.util.Map;

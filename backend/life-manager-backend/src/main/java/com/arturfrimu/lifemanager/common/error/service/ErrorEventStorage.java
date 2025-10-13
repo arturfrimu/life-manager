@@ -1,7 +1,7 @@
-package com.arturfrimu.lifemanager.error.service;
+package com.arturfrimu.lifemanager.common.error.service;
 
-import com.arturfrimu.lifemanager.config.MinioProperties;
-import com.arturfrimu.lifemanager.error.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.common.config.MinioProperties;
+import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -9,9 +9,7 @@ import io.minio.PutObjectArgs;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
