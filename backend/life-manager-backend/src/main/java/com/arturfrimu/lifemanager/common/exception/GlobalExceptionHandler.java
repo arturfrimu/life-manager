@@ -33,36 +33,34 @@ public class GlobalExceptionHandler {
 
     @NonFinal
     @Value("${spring.application.name:life-manager}")
-    private String APP_NAME;
+    String APP_NAME;
 
     ErrorEventStorage errorEventStorage;
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-        var path = getRequestPath(request);
-        var method = getRequestMethod(request);
-        log.error("Illegal argument exception on {} {}: {}", method, path, ex.getMessage());
-        var exceptionName = ExceptionDetailsIdentifierUtils.originalExceptionName(ex);
-        saveErrorToMinio(exceptionName, ex, null, path, method);
-
-        var errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.name(),
-                ex.getMessage(),
-                path,
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex, WebRequest request) {
+        return handleException(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                ExceptionDetailsIdentifierUtils.originalExceptionName(ex),
                 null
         );
+    }
 
-        return ResponseEntity.badRequest().body(errorResponse);
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        return handleException(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                ExceptionDetailsIdentifierUtils.originalExceptionName(ex),
+                null
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
-        var path = getRequestPath(request);
-        var method = getRequestMethod(request);
-        log.error("Validation exception on {} {}: {}", method, path, ex.getMessage());
-
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             var fieldName = ((FieldError) error).getField();
@@ -70,81 +68,102 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        saveErrorToMinio("MethodArgumentNotValidException", ex, errors, path, method);
-
-        var errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
+        return handleException(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                ExceptionDetailsIdentifierUtils.originalExceptionName(ex),
+                errors,
                 "Validation Failed",
-                "Input validation failed",
-                path,
-                errors
+                "Input validation failed"
         );
-
-        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request) {
-        var path = getRequestPath(request);
-        var method = getRequestMethod(request);
-        log.error("Type mismatch exception on {} {}: {}", method, path, ex.getMessage());
-
-        saveErrorToMinio("MethodArgumentTypeMismatchException", ex, Collections.emptyMap(), path, method);
-
-        var errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                "Input validation failed",
-                path,
-                Collections.emptyMap()
+        return handleException(
+                ex,
+                request,
+                HttpStatus.BAD_REQUEST,
+                ExceptionDetailsIdentifierUtils.originalExceptionName(ex),
+                Collections.emptyMap(),
+                "Type Mismatch",
+                "Invalid parameter type"
         );
-
-        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, WebRequest request) {
+        return handleException(
+                ex,
+                request,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ExceptionDetailsIdentifierUtils.originalExceptionName(ex),
+                null,
+                "Internal Server Error",
+                "An unexpected error occurred"
+        );
+    }
+
+    private ResponseEntity<ErrorResponse> handleException(
+            Exception ex,
+            WebRequest request,
+            HttpStatus status,
+            String eventType,
+            Map<String, String> validationErrors
+    ) {
+        return handleException(ex, request, status, eventType, validationErrors, status.name(), ex.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> handleException(
+            Exception ex,
+            WebRequest request,
+            HttpStatus status,
+            String eventType,
+            Map<String, String> validationErrors,
+            String errorTitle,
+            String errorMessage
+    ) {
         var path = getRequestPath(request);
         var method = getRequestMethod(request);
-        log.error("Unexpected error on {} {}: ", method, path, ex);
 
-        saveErrorToMinio("Exception", ex, null, path, method);
+        log.error("{} on {} {}: {}", eventType, method, path, ex.getMessage());
+
+        saveErrorToMinio(eventType, ex, validationErrors, path, method);
 
         var errorResponse = new ErrorResponse(
                 Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "An unexpected error occurred",
+                status.value(),
+                errorTitle,
+                errorMessage,
                 path,
-                null
+                validationErrors
         );
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     private void saveErrorToMinio(String eventType, Exception ex, Map<String, String> validationErrors, String path, String method) {
         try {
             var stackTrace = getStackTraceAsString(ex);
-            
+
             Map<String, Object> details = new HashMap<>();
             details.put("stackTrace", stackTrace);
             details.put("exceptionClass", ex.getClass().getName());
             details.put("requestPath", path);
             details.put("requestMethod", method);
-            
+
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 details.put("validationErrors", validationErrors);
             }
-            
+
             var errorEvent = ErrorEvent.create(
                     eventType,
                     APP_NAME,
                     ex.getMessage() != null ? ex.getMessage() : "No message available",
                     details
             );
-            
+
             errorEventStorage.saveEventWithRetry(errorEvent);
         } catch (Exception e) {
             log.error("Critical: Failed to save error event", e);
