@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.sport.adapter;
+package com.arturfrimu.lifemanager.sport.repository;
 
 import com.arturfrimu.lifemanager.sport.entity.ExerciseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

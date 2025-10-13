@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.sport.adapter;
+package com.arturfrimu.lifemanager.sport.service;
 
 import com.arturfrimu.lifemanager.sport.domain.Exercise;
 import com.arturfrimu.lifemanager.sport.enums.Type;

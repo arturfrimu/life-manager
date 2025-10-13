@@ -1,7 +1,6 @@
-package com.arturfrimu.lifemanager.sport.adapter;
+package com.arturfrimu.lifemanager.sport.repository;
 
 import com.arturfrimu.lifemanager.sport.domain.Exercise;
-import com.arturfrimu.lifemanager.sport.entity.ExerciseEntity;
 import com.arturfrimu.lifemanager.sport.mapper.ExerciseMapper;
 import com.arturfrimu.lifemanager.sport.port.ExerciseRepositoryPort;
 import lombok.AccessLevel;
