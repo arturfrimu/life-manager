@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +37,8 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
             throw new IllegalArgumentException("Exercise with name '" + name + "' already exists");
         }
 
-        Exercise exercise = Exercise.create(name, type, description);
-        Exercise savedExercise = exerciseRepositoryPort.save(exercise);
+        var exercise = Exercise.create(name, type, description);
+        var savedExercise = exerciseRepositoryPort.save(exercise);
 
         log.info("Successfully created exercise with id: {}", savedExercise.id());
         return savedExercise;
@@ -50,5 +52,14 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         log.info("Retrieving exercise with id: {}", id);
         return exerciseRepositoryPort.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Exercise with id '" + id + "' not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Exercise> findAllExercises(Pageable pageable) {
+        Preconditions.checkArgument(Objects.nonNull(pageable), "Pageable cannot be null");
+        
+        log.info("Retrieving exercises with page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        return exerciseRepositoryPort.findAll(pageable);
     }
 }

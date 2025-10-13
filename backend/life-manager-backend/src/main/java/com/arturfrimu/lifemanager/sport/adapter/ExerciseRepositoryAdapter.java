@@ -7,6 +7,8 @@ import com.arturfrimu.lifemanager.sport.port.ExerciseRepositoryPort;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,8 +24,8 @@ public class ExerciseRepositoryAdapter implements ExerciseRepositoryPort {
 
     @Override
     public Exercise save(Exercise exercise) {
-        ExerciseEntity entity = exerciseMapper.toEntity(exercise);
-        ExerciseEntity savedEntity = jpaRepository.save(entity);
+        var entity = exerciseMapper.toEntity(exercise);
+        var savedEntity = jpaRepository.save(entity);
         return exerciseMapper.toDomain(savedEntity);
     }
 
@@ -36,5 +38,11 @@ public class ExerciseRepositoryAdapter implements ExerciseRepositoryPort {
     @Override
     public boolean existsByName(String name) {
         return jpaRepository.existsByName(name);
+    }
+
+    @Override
+    public Page<Exercise> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable)
+                .map(exerciseMapper::toDomain);
     }
 }
