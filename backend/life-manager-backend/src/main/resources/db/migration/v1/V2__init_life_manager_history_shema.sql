@@ -3,7 +3,9 @@ create schema if not exists life_manager_history;
 create table if not exists life_manager_history.revinfo
 (
     rev bigserial primary key,
-    revtstmp bigint
+    revtstmp bigint,
+    username varchar(128),
+    source_ip varchar(128)
 );
 
 create table life_manager_history.exercise_history
