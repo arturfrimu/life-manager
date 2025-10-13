@@ -3,6 +3,7 @@ package com.arturfrimu.lifemanager.sport.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,4 +29,7 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(name = "updated", nullable = false)
     private Instant updated;
+    @Version
+    @Column(name = "version")
+    private int version;
 }

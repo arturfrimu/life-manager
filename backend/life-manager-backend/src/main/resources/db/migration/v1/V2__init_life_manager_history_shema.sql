@@ -2,22 +2,18 @@ create schema if not exists life_manager_history;
 
 create table if not exists life_manager_history.revinfo
 (
-    rev
-    bigserial
-    primary
-    key,
-    revtstmp
-    bigint
+    rev bigserial primary key,
+    revtstmp bigint
 );
 
 create table life_manager_history.exercise_history
 (
     id            uuid                     not null,
-    created       timestamp with time zone not null,
-    updated       timestamp with time zone not null,
     name          varchar(128)             not null,
     type          varchar(64),
     description   text,
+    created       timestamp with time zone not null,
+    updated       timestamp with time zone not null,
     revision_id   bigint                   not null,
     revision_type smallint                 not null,
     constraint fk_exercise_history_revinfo
@@ -29,11 +25,11 @@ create table life_manager_history.exercise_history
 create table life_manager_history.repetition_history
 (
     id            uuid                     not null,
-    created       timestamp with time zone not null,
-    updated       timestamp with time zone not null,
     weight        numeric(19, 0),
     completed     boolean                  not null,
     executed_at   timestamp with time zone,
+    created       timestamp with time zone not null,
+    updated       timestamp with time zone not null,
     revision_id   bigint                   not null,
     revision_type smallint                 not null,
     constraint fk_repetition_history_revinfo
@@ -45,10 +41,10 @@ create table life_manager_history.repetition_history
 create table life_manager_history.workout_history
 (
     id            uuid                     not null,
-    created       timestamp with time zone not null,
-    updated       timestamp with time zone not null,
     name          varchar(128)             not null,
     description   text,
+    created       timestamp with time zone not null,
+    updated       timestamp with time zone not null,
     revision_id   bigint                   not null,
     revision_type smallint                 not null,
     constraint fk_workout_history_revinfo
