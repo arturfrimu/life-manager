@@ -1,7 +1,7 @@
 package com.arturfrimu.lifemanager.common.exception;
 
 import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
-import com.arturfrimu.lifemanager.common.error.service.ErrorEventStorage;
+import com.arturfrimu.lifemanager.common.error.service.MinioErrorEventStorage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +17,7 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AsyncErrorAspect {
 
-    ErrorEventStorage errorEventStorage;
+    MinioErrorEventStorage minioErrorEventStorage;
 
     @AfterThrowing(pointcut = "@annotation(org.springframework.scheduling.annotation.Scheduled)", throwing = "ex")
     public void handleScheduledError(Exception ex) throws Exception {
@@ -28,7 +28,7 @@ public class AsyncErrorAspect {
                 ex.getMessage(),
                 Map.of("task", "unknown", "stackTrace", ex.getStackTrace())
         );
-        errorEventStorage.saveEventWithRetry(errorEvent);
+        minioErrorEventStorage.saveEventWithRetry(errorEvent);
     }
 }
 

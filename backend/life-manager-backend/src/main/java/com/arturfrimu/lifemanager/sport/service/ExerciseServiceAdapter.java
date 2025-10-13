@@ -1,5 +1,6 @@
 package com.arturfrimu.lifemanager.sport.service;
 
+import com.arturfrimu.lifemanager.common.storage.MinioStorageService;
 import com.arturfrimu.lifemanager.sport.domain.Exercise;
 import com.arturfrimu.lifemanager.sport.enums.Type;
 import com.arturfrimu.lifemanager.sport.port.ExerciseRepositoryPort;
@@ -13,7 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class ExerciseServiceAdapter implements ExerciseServicePort {
 
     ExerciseRepositoryPort exerciseRepositoryPort;
+    MinioStorageService minioStorageService;
 
     @Override
     @Transactional
@@ -34,7 +38,7 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         log.info("Creating exercise with name: {}", name);
 
         if (exerciseRepositoryPort.existsByName(name)) {
-            throw new IllegalArgumentException("Exercise with name '" + name + "' already exists");
+            throw new IllegalArgumentException("Exercise with name '%s' already exists".formatted(name));
         }
 
         var exercise = Exercise.create(name, type, description);
@@ -51,7 +55,7 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
 
         log.info("Retrieving exercise with id: {}", id);
         return exerciseRepositoryPort.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Exercise with id '" + id + "' not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Exercise with id '%s' not found".formatted(id)));
     }
 
     @Override
@@ -71,7 +75,7 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         log.info("Deleting exercise with id: {}", id);
         
         if (exerciseRepositoryPort.findById(id).isEmpty()) {
-            throw new IllegalArgumentException("Exercise with id '" + id + "' not found");
+            throw new IllegalArgumentException("Exercise with id '%s' not found".formatted(id));
         }
         
         exerciseRepositoryPort.deleteById(id);
@@ -108,5 +112,42 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         
         log.info("Successfully updated exercise with id: {}", savedExercise.id());
         return savedExercise;
+    }
+
+    @Override
+    public List<String> uploadExerciseImages(UUID exerciseId, List<MultipartFile> images) {
+        Preconditions.checkArgument(Objects.nonNull(exerciseId), "Exercise id cannot be null");
+        Preconditions.checkArgument(Objects.nonNull(images) && !images.isEmpty(), "Images list cannot be null or empty");
+        
+        log.info("Uploading {} images for exercise with id: {}", images.size(), exerciseId);
+        
+        exerciseRepositoryPort.findById(exerciseId)
+                .orElseThrow(() -> new IllegalArgumentException("Exercise with id '%s' not found".formatted(exerciseId)));
+        
+        for (MultipartFile image : images) {
+            validateImageFile(image);
+        }
+        
+        var folder = "exercises/%s/images".formatted(exerciseId);
+        var imageUrls = minioStorageService.uploadFiles(folder, images);
+        
+        log.info("Successfully uploaded {} images for exercise with id: {}", imageUrls.size(), exerciseId);
+        return imageUrls;
+    }
+    
+    private void validateImageFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty");
+        }
+        
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("File must be an image. Received content type: %s".formatted(contentType));
+        }
+        
+        long maxFileSize = 10 * 1024 * 1024; // 10MB
+        if (file.getSize() > maxFileSize) {
+            throw new IllegalArgumentException("File size cannot exceed 10MB. Received: %d bytes".formatted(file.getSize()));
+        }
     }
 }

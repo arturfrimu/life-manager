@@ -90,7 +90,7 @@ public class FileErrorStorage {
     }
 
     private String formatException(Exception e) {
-        return "%-74s".formatted(e.getClass().getSimpleName() + ": " + e.getMessage());
+        return "%-74s".formatted("%s: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
     }
 
     private String formatEventJson(ErrorEvent errorEvent) {
@@ -99,7 +99,7 @@ public class FileErrorStorage {
                     .writeValueAsString(errorEvent)
                     .replaceAll("\n", "\n║ ");
         } catch (Exception e) {
-            return "Failed to serialize event: " + e.getMessage();
+            return "Failed to serialize event: %s".formatted(e.getMessage());
         }
     }
 

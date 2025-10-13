@@ -18,6 +18,7 @@ public class AppRevisionListener implements RevisionListener {
             setSourceIpFromRequestContextHolder(rev);
         } else {
             log.error("CRITICAL! No revision entity of type {} is not supported", revisionEntity.getClass());
+            throw new IllegalArgumentException("No revision entity of type %s".formatted(revisionEntity.getClass()));
         }
     }
 

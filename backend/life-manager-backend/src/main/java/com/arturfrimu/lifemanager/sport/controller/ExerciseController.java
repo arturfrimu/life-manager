@@ -14,9 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -95,5 +98,18 @@ public class ExerciseController {
         
         log.info("Successfully updated exercise with id: {}", exercise.id());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<String>> uploadExerciseImages(
+            @PathVariable UUID id,
+            @RequestParam("images") List<MultipartFile> images
+    ) {
+        log.info("Received request to upload {} images for exercise with id: {}", images.size(), id);
+        
+        var imageUrls = exerciseServicePort.uploadExerciseImages(id, images);
+        
+        log.info("Successfully uploaded {} images for exercise with id: {}", imageUrls.size(), id);
+        return ResponseEntity.ok(imageUrls);
     }
 }

@@ -2,10 +2,8 @@ package com.arturfrimu.lifemanager.common.error.service;
 
 import com.arturfrimu.lifemanager.common.config.MinioProperties;
 import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.common.storage.MinioStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +14,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -24,12 +21,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ErrorEventStorage {
+public class MinioErrorEventStorage {
 
-    MinioClient minioClient;
     ObjectMapper objectMapper;
-    FileErrorStorage fileErrorStorage;
+    MinioStorageService minioStorageService;
     MinioProperties minioProperties;
+    FileErrorStorage fileErrorStorage;
 
     public String generateFileName(String eventType) {
         var uuid = UUID.randomUUID();
@@ -46,13 +43,12 @@ public class ErrorEventStorage {
         var objectName = generateFileName(errorEvent.eventType());
         var jsonData = objectMapper.writeValueAsBytes(errorEvent);
 
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(minioProperties.getBucketName())
-                        .object(objectName)
-                        .stream(new ByteArrayInputStream(jsonData), jsonData.length, -1)
-                        .contentType("application/json")
-                        .build()
+        minioStorageService.uploadFile(
+                minioProperties.getBucketName(),
+                objectName,
+                new ByteArrayInputStream(jsonData),
+                jsonData.length,
+                "application/json"
         );
 
         log.info("Saved error event to MinIO as {}", objectName);
@@ -63,29 +59,5 @@ public class ErrorEventStorage {
         log.warn("Failed to save error event to MinIO after retries, falling back to file storage: {}", e.getMessage());
         fileErrorStorage.saveErrorToFile(errorEvent);
         log.info("Successfully saved error event to file storage as fallback");
-    }
-
-    @Retryable(
-            retryFor = Exception.class,
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
-    public ErrorEvent readEvent(String objectName) throws Exception {
-        try (InputStream stream = minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(minioProperties.getBucketName())
-                        .object(objectName)
-                        .build())) {
-
-            var event = objectMapper.readValue(stream, ErrorEvent.class);
-            log.info("Read error event from MinIO: {}", objectName);
-            return event;
-        }
-    }
-
-    @Recover
-    public ErrorEvent recoverFromReadFailure(Exception e, String objectName) {
-        log.error("Failed to read error event from MinIO after retries: {}", objectName, e);
-        throw new RuntimeException("Failed to read error event from MinIO: %s".formatted(objectName), e);
     }
 }

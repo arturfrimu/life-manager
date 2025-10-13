@@ -1,7 +1,7 @@
 package com.arturfrimu.lifemanager.common.exception;
 
 import com.arturfrimu.lifemanager.common.error.domain.ErrorEvent;
-import com.arturfrimu.lifemanager.common.error.service.ErrorEventStorage;
+import com.arturfrimu.lifemanager.common.error.service.MinioErrorEventStorage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @Value("${spring.application.name:life-manager}")
     String APP_NAME;
 
-    ErrorEventStorage errorEventStorage;
+    MinioErrorEventStorage minioErrorEventStorage;
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex, WebRequest request) {
@@ -164,7 +164,7 @@ public class GlobalExceptionHandler {
                     details
             );
 
-            errorEventStorage.saveEventWithRetry(errorEvent);
+            minioErrorEventStorage.saveEventWithRetry(errorEvent);
         } catch (Exception e) {
             log.error("Critical: Failed to save error event", e);
         }
