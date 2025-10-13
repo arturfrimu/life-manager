@@ -109,7 +109,7 @@ public class GlobalExceptionHandler {
             
             errorEventStorage.saveEventWithRetry(errorEvent);
         } catch (Exception e) {
-            log.error("Failed to save error event to MinIO", e);
+            log.error("Critical: Failed to save error event", e);
         }
     }
 

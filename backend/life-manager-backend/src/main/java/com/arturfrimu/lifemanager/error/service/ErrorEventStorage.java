@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.errors.MinioException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -35,58 +37,45 @@ public class ErrorEventStorage {
         return "%s_%s_%d.json".formatted(eventType, uuid, timestamp);
     }
 
-    public void saveEventWithRetry(ErrorEvent errorEvent) {
-        var eventType = errorEvent.eventType();
-        var objectName = generateFileName(eventType);
-        var maxRetries = 3;
-        var minioSaveSuccessful = false;
+    @Retryable(
+            retryFor = Exception.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public void saveEventWithRetry(ErrorEvent errorEvent) throws Exception {
+        var objectName = generateFileName(errorEvent.eventType());
+        var jsonData = objectMapper.writeValueAsBytes(errorEvent);
 
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                var jsonData = objectMapper.writeValueAsBytes(errorEvent);
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(minioProperties.getBucketName())
+                        .object(objectName)
+                        .stream(new ByteArrayInputStream(jsonData), jsonData.length, -1)
+                        .contentType("application/json")
+                        .build()
+        );
 
-                minioClient.putObject(
-                        PutObjectArgs.builder()
-                                .bucket(minioProperties.getBucketName())
-                                .object(objectName)
-                                .stream(new ByteArrayInputStream(jsonData), jsonData.length, -1)
-                                .contentType("application/json")
-                                .build()
-                );
+        log.info("Saved error event to MinIO as {}", objectName);
+    }
 
-                log.info("Saved error event to MinIO as {}", objectName);
-                minioSaveSuccessful = true;
-                break;
-            } catch (MinioException e) {
-                log.error("Attempt {} failed to save error event to MinIO: {}", attempt, e.getMessage());
-                if (attempt == maxRetries) {
-                    log.warn("Failed to save error event to MinIO after {} attempts, falling back to file storage", maxRetries);
-                }
-
-                try {
-                    Thread.sleep(1000L * attempt);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
-            } catch (Exception e) {
-                log.error("Failed to save error event to MinIO: {}", e.getMessage());
-                if (attempt == maxRetries) {
-                    log.warn("Failed to save error event to MinIO, falling back to file storage");
-                }
-            }
-        }
-
-        if (!minioSaveSuccessful) {
-            try {
-                fileErrorStorage.saveErrorToFile(errorEvent);
-                log.info("Successfully saved error event to file storage as fallback");
-            } catch (Exception e) {
-                log.error("Failed to save error event to both MinIO and file storage", e);
-            }
+    @Recover
+    public void recoverFromMinioFailure(Exception e, ErrorEvent errorEvent) {
+        log.warn("Failed to save error event to MinIO after retries, falling back to file storage: {}", e.getMessage());
+        
+        try {
+            fileErrorStorage.saveErrorToFile(errorEvent);
+            log.info("Successfully saved error event to file storage as fallback");
+        } catch (Exception fileException) {
+            log.error("Failed to save error event to both MinIO and file storage", fileException);
         }
     }
 
-    public ErrorEvent readEvent(String objectName) {
+    @Retryable(
+            retryFor = Exception.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public ErrorEvent readEvent(String objectName) throws Exception {
         try (InputStream stream = minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(minioProperties.getBucketName())
@@ -96,9 +85,12 @@ public class ErrorEventStorage {
             var event = objectMapper.readValue(stream, ErrorEvent.class);
             log.info("Read error event from MinIO: {}", objectName);
             return event;
-        } catch (Exception e) {
-            log.error("Failed to read error event from MinIO: {}", objectName, e);
-            throw new RuntimeException("Failed to read error event from MinIO", e);
         }
+    }
+
+    @Recover
+    public ErrorEvent recoverFromReadFailure(Exception e, String objectName) {
+        log.error("Failed to read error event from MinIO after retries: {}", objectName, e);
+        throw new RuntimeException("Failed to read error event from MinIO: %s".formatted(objectName), e);
     }
 }
