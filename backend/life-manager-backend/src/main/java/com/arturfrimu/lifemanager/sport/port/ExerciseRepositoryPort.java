@@ -15,4 +15,6 @@ public interface ExerciseRepositoryPort {
     boolean existsByName(String name);
 
     Page<Exercise> findAll(Pageable pageable);
+
+    void deleteById(UUID id);
 }

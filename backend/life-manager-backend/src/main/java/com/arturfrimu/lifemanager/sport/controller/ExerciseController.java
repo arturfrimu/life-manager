@@ -65,4 +65,14 @@ public class ExerciseController {
         
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExercise(@PathVariable UUID id) {
+        log.info("Received request to delete exercise with id: {}", id);
+        
+        exerciseServicePort.deleteExercise(id);
+        
+        log.info("Successfully deleted exercise with id: {}", id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -62,4 +62,20 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
         log.info("Retrieving exercises with page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
         return exerciseRepositoryPort.findAll(pageable);
     }
+
+    @Override
+    @Transactional
+    public void deleteExercise(UUID id) {
+        Preconditions.checkArgument(Objects.nonNull(id), "Id cannot be null");
+        
+        log.info("Deleting exercise with id: {}", id);
+        
+        if (exerciseRepositoryPort.findById(id).isEmpty()) {
+            throw new IllegalArgumentException("Exercise with id '" + id + "' not found");
+        }
+        
+        exerciseRepositoryPort.deleteById(id);
+        
+        log.info("Successfully deleted exercise with id: {}", id);
+    }
 }

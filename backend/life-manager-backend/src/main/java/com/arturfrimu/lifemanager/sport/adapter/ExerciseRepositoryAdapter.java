@@ -45,4 +45,9 @@ public class ExerciseRepositoryAdapter implements ExerciseRepositoryPort {
         return jpaRepository.findAll(pageable)
                 .map(exerciseMapper::toDomain);
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
 }
