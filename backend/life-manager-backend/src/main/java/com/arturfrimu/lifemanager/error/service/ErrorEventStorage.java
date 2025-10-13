@@ -26,6 +26,7 @@ public class ErrorEventStorage {
 
     MinioClient minioClient;
     ObjectMapper objectMapper;
+    FileErrorStorage fileErrorStorage;
     MinioProperties minioProperties;
 
     public String generateFileName(String eventType) {
@@ -38,6 +39,7 @@ public class ErrorEventStorage {
         var eventType = errorEvent.eventType();
         var objectName = generateFileName(eventType);
         var maxRetries = 3;
+        var minioSaveSuccessful = false;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
@@ -53,12 +55,12 @@ public class ErrorEventStorage {
                 );
 
                 log.info("Saved error event to MinIO as {}", objectName);
+                minioSaveSuccessful = true;
                 break;
             } catch (MinioException e) {
-                log.error("Attempt {} failed to save error event: {}", attempt, e.getMessage());
+                log.error("Attempt {} failed to save error event to MinIO: {}", attempt, e.getMessage());
                 if (attempt == maxRetries) {
-                    log.error("Failed to save error event after {} attempts", maxRetries, e);
-                    throw new RuntimeException("Failed to save error event to MinIO", e);
+                    log.warn("Failed to save error event to MinIO after {} attempts, falling back to file storage", maxRetries);
                 }
 
                 try {
@@ -67,8 +69,19 @@ public class ErrorEventStorage {
                     Thread.currentThread().interrupt();
                 }
             } catch (Exception e) {
-                log.error("Failed to save error event", e);
-                throw new RuntimeException("Failed to save error event to MinIO", e);
+                log.error("Failed to save error event to MinIO: {}", e.getMessage());
+                if (attempt == maxRetries) {
+                    log.warn("Failed to save error event to MinIO, falling back to file storage");
+                }
+            }
+        }
+
+        if (!minioSaveSuccessful) {
+            try {
+                fileErrorStorage.saveErrorToFile(errorEvent);
+                log.info("Successfully saved error event to file storage as fallback");
+            } catch (Exception e) {
+                log.error("Failed to save error event to both MinIO and file storage", e);
             }
         }
     }

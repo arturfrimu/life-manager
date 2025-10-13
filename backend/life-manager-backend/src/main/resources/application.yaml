@@ -43,3 +43,6 @@ minio:
   secret-key: ${MINIO_SECRET_KEY:minio_admin}
   bucket-name: ${MINIO_BUCKET_NAME:errors-bucket}
   auto-create-bucket: ${MINIO_AUTO_CREATE_BUCKET:true}
+
+error-storage:
+  file-path: ${ERROR_STORAGE_FILE_PATH:./error-events}
