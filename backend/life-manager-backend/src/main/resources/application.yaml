@@ -36,3 +36,10 @@ spring:
           hbm2ddl:
             auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minio_admin}
+  secret-key: ${MINIO_SECRET_KEY:minio_admin}
+  bucket-name: ${MINIO_BUCKET_NAME:errors-bucket}
+  auto-create-bucket: ${MINIO_AUTO_CREATE_BUCKET:true}

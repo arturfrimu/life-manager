@@ -1,5 +1,10 @@
 package com.arturfrimu.lifemanager.sport.exception;
 
+import com.arturfrimu.lifemanager.error.domain.ErrorEvent;
+import com.arturfrimu.lifemanager.error.service.ErrorEventStorage;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,22 +13,30 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
 @Slf4j
+@RestControllerAdvice
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GlobalExceptionHandler {
+
+    ErrorEventStorage errorEventStorage;
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Illegal argument exception: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        saveErrorToMinio("IllegalArgumentException", ex, null);
+
+        var errorResponse = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                HttpStatus.BAD_REQUEST.name(),
                 ex.getMessage(),
                 "/api/v1/exercises",
                 null
@@ -38,12 +51,14 @@ public class GlobalExceptionHandler {
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
+            var fieldName = ((FieldError) error).getField();
+            var errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        saveErrorToMinio("MethodArgumentNotValidException", ex, errors);
+
+        var errorResponse = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
@@ -59,7 +74,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unexpected error: ", ex);
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        saveErrorToMinio("Exception", ex, null);
+
+        var errorResponse = new ErrorResponse(
                 Instant.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
@@ -69,5 +86,37 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    private void saveErrorToMinio(String eventType, Exception ex, Map<String, String> validationErrors) {
+        try {
+            var stackTrace = getStackTraceAsString(ex);
+            
+            Map<String, Object> details = new HashMap<>();
+            details.put("stackTrace", stackTrace);
+            details.put("exceptionClass", ex.getClass().getName());
+            
+            if (validationErrors != null && !validationErrors.isEmpty()) {
+                details.put("validationErrors", validationErrors);
+            }
+            
+            var errorEvent = ErrorEvent.create(
+                    eventType,
+                    "life-manager",
+                    ex.getMessage() != null ? ex.getMessage() : "No message available",
+                    details
+            );
+            
+            errorEventStorage.saveEventWithRetry(errorEvent);
+        } catch (Exception e) {
+            log.error("Failed to save error event to MinIO", e);
+        }
+    }
+
+    private String getStackTraceAsString(Exception ex) {
+        var sw = new StringWriter();
+        var pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        return sw.toString();
     }
 }
