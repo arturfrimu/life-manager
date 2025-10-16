@@ -116,15 +116,16 @@ public class ExerciseServiceAdapter implements ExerciseServicePort {
     }
 
     @Override
+    @Transactional
     public List<String> uploadExerciseImages(UUID exerciseId, List<MultipartFile> images) {
         Preconditions.checkArgument(Objects.nonNull(exerciseId), "Exercise id cannot be null");
         Preconditions.checkArgument(Objects.nonNull(images) && !images.isEmpty(), "Images list cannot be null or empty");
         
         log.info("Uploading {} images for exercise with id: {}", images.size(), exerciseId);
-        
-        exerciseRepositoryPort.findById(exerciseId)
+
+        var exercise = exerciseRepositoryPort.findById(exerciseId)
                 .orElseThrow(() -> new IllegalArgumentException("Exercise with id '%s' not found".formatted(exerciseId)));
-        
+
         for (MultipartFile image : images) {
             validateImageFile(image);
         }

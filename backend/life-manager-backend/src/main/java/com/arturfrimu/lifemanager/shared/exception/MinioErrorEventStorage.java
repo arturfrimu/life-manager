@@ -1,6 +1,5 @@
 package com.arturfrimu.lifemanager.shared.exception;
 
-import com.arturfrimu.lifemanager.config.MinioProperties;
 import com.arturfrimu.lifemanager.shared.util.storage.MinioStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -22,10 +21,10 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MinioErrorEventStorage {
 
-    public static final String ERRORS_FOLDER = "ERRORS";
+    private static final String ERRORS_FOLDER = "ERRORS";
+
     ObjectMapper objectMapper;
     MinioStorageService minioStorageService;
-    MinioProperties minioProperties;
     FileErrorStorage fileErrorStorage;
 
     public String generateFileName(String eventType) {

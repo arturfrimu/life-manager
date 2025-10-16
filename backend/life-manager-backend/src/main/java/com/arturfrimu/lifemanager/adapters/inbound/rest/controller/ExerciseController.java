@@ -100,16 +100,16 @@ public class ExerciseController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{exerciseId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<String>> uploadExerciseImages(
-            @PathVariable UUID id,
+            @PathVariable UUID exerciseId,
             @RequestParam("images") List<MultipartFile> images
     ) {
-        log.info("Received request to upload {} images for exercise with id: {}", images.size(), id);
+        log.info("Received request to upload {} images for exercise with id: {}", images.size(), exerciseId);
         
-        var imageUrls = exerciseServicePort.uploadExerciseImages(id, images);
+        var imageUrls = exerciseServicePort.uploadExerciseImages(exerciseId, images);
         
-        log.info("Successfully uploaded {} images for exercise with id: {}", imageUrls.size(), id);
+        log.info("Successfully uploaded {} images for exercise with id: {}", imageUrls.size(), exerciseId);
         return ResponseEntity.ok(imageUrls);
     }
 }
