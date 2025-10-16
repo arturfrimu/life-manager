@@ -1,6 +1,7 @@
 package com.arturfrimu.lifemanager.shared.util.storage;
 
 import com.arturfrimu.lifemanager.config.MinioProperties;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -26,7 +27,7 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     MinioProperties minioProperties;
 
     @Override
-    public String uploadFile(String folder, String filename, InputStream stream, long size, String fileContentType) {
+    public UploadedFileInfo uploadFile(String folder, String filename, InputStream stream, long size, String fileContentType) {
         try {
             var objectName = "%s/%s".formatted(folder, filename);
 
@@ -41,7 +42,15 @@ public class MinioStorageServiceImpl implements MinioStorageService {
 
             var fileUrl = getFileUrl(objectName);
             log.info("Successfully uploaded file: {} to MinIO", objectName);
-            return fileUrl;
+            
+            return UploadedFileInfo.builder()
+                    .fileName(filename)
+                    .objectKey(objectName)
+                    .bucketName(minioProperties.getBucketName())
+                    .url(fileUrl)
+                    .contentType(fileContentType)
+                    .size(size)
+                    .build();
         } catch (Exception e) {
             log.error("Failed to upload file: {} to MinIO", filename, e);
             throw new RuntimeException("Failed to upload file to storage", e);
@@ -49,22 +58,22 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     }
 
     @Override
-    public List<String> uploadFiles(String folder, List<MultipartFile> files) {
-        List<String> uploadedFileUrls = new ArrayList<>();
+    public List<UploadedFileInfo> uploadFiles(String folder, List<MultipartFile> files) {
+        List<UploadedFileInfo> uploadedFiles = new ArrayList<>();
 
         for (MultipartFile file : files) {
             try {
                 var uniqueFilename = "%s_%s".formatted(UUID.randomUUID(), file.getOriginalFilename());
-                var fileUrl = uploadFile(folder, uniqueFilename, file.getInputStream(), file.getSize(), file.getContentType());
-                uploadedFileUrls.add(fileUrl);
+                var uploadedFileInfo = uploadFile(folder, uniqueFilename, file.getInputStream(), file.getSize(), file.getContentType());
+                uploadedFiles.add(uploadedFileInfo);
             } catch (Exception e) {
                 log.error("Failed to upload file: {}", file.getOriginalFilename(), e);
                 throw new RuntimeException("Failed to upload file to storage", e);
             }
         }
 
-        log.info("Successfully uploaded {} files to MinIO", uploadedFileUrls.size());
-        return uploadedFileUrls;
+        log.info("Successfully uploaded {} files to MinIO", uploadedFiles.size());
+        return uploadedFiles;
     }
 
     @Override
@@ -85,11 +94,27 @@ public class MinioStorageServiceImpl implements MinioStorageService {
 
     @Override
     public String getFileUrl(String objectName) {
-        return "%s/%s/%s".formatted(
+        return "%s/%s%s".formatted(
                 minioProperties.getEndpoint(),
                 minioProperties.getBucketName(),
                 objectName
         );
+    }
+
+    @Override
+    public byte[] downloadFile(String objectKey) {
+        try (var stream = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(minioProperties.getBucketName())
+                        .object(objectKey)
+                        .build()
+        )) {
+            log.info("Downloading file from MinIO: {}", objectKey);
+            return stream.readAllBytes();
+        } catch (Exception e) {
+            log.error("Failed to download file: {} from MinIO", objectKey, e);
+            throw new RuntimeException("Failed to download file from storage", e);
+        }
     }
 }
 

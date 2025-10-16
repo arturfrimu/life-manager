@@ -6,6 +6,7 @@ import com.arturfrimu.lifemanager.adapters.inbound.rest.dto.ExerciseResponse;
 import com.arturfrimu.lifemanager.adapters.inbound.rest.dto.UpdateExerciseRequest;
 import com.arturfrimu.lifemanager.adapters.inbound.rest.mapper.ExerciseMapper;
 import com.arturfrimu.lifemanager.application.port.input.ExerciseServicePort;
+import com.arturfrimu.lifemanager.application.port.input.ImageServicePort;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +31,10 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExerciseController {
 
-    ExerciseServicePort exerciseServicePort;
     ExerciseMapper exerciseMapper;
+
+    ExerciseServicePort exerciseServicePort;
+    ImageServicePort imageServicePort;
 
     @PostMapping
     public ResponseEntity<ExerciseResponse> createExercise(@Valid @RequestBody CreateExerciseRequest request) {
@@ -111,6 +115,18 @@ public class ExerciseController {
         
         log.info("Successfully uploaded {} images for exercise with id: {}", imageUrls.size(), exerciseId);
         return ResponseEntity.ok(imageUrls);
+    }
+
+    @GetMapping("/{exerciseId}/images")
+    public ResponseEntity<byte[]> downloadExerciseImages(@PathVariable UUID exerciseId) {
+        log.info("Received request to download all images for exercise with id: {}", exerciseId);
+
+        var zipData = imageServicePort.downloadExerciseImagesAsZip(exerciseId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"exercise-%s-images.zip\"".formatted(exerciseId))
+                .body(zipData);
     }
 }
 

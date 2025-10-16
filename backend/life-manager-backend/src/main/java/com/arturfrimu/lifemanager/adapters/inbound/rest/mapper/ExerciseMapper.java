@@ -11,10 +11,11 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = ImageMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ExerciseMapper {
     
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "images", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "updated", ignore = true)
     Exercise toDomain(CreateExerciseRequest request);

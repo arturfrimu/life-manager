@@ -3,6 +3,7 @@ package com.arturfrimu.lifemanager.domain.model;
 import com.google.common.base.Preconditions;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record Exercise(
@@ -10,6 +11,7 @@ public record Exercise(
         String name,
         Type type,
         String description,
+        List<Image> images,
         Instant created,
         Instant updated
 ) {
@@ -22,6 +24,7 @@ public record Exercise(
                 name.trim(),
                 type,
                 description,
+                List.of(),
                 null,
                 null
         );

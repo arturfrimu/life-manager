@@ -31,6 +31,7 @@ public class ExerciseImageEntity extends BaseEntity {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class ExerciseImagesId implements Serializable {
         private UUID exerciseId;
         private UUID imageId;
