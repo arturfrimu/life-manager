@@ -31,3 +31,22 @@ create table life_manager_history.image_history
             references life_manager_history.revinfo (rev)
             on delete cascade
 );
+
+create table life_manager.exercise_images
+(
+    exercise_id uuid not null,
+    image_id    uuid not null,
+    constraint pk_exercise_images primary key (exercise_id, image_id),
+    constraint fk_exercise_images_exercise foreign key (exercise_id) references life_manager.exercise (id),
+    constraint fk_exercise_images_image foreign key (image_id) references life_manager.image (id)
+);
+
+create table life_manager_history.exercise_images_history
+(
+    exercise_id uuid not null,
+    image_id    uuid not null,
+    rev         integer not null,
+    revtype     smallint,
+    constraint pk_exercise_images_history primary key (exercise_id, image_id, rev),
+    constraint fk_exercise_images_hist_rev foreign key (rev) references life_manager_history.revinfo (rev)
+);
