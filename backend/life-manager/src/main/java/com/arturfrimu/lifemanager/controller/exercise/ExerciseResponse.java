@@ -8,6 +8,7 @@ public record ExerciseResponse(
         String name,
         String type,
         String description,
+        String imageUrl,
         UUID createdByUserId,
         Instant created,
         Instant updated

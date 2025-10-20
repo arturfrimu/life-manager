@@ -33,6 +33,10 @@ public class Exercise extends BaseEntity {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
+    @Size(max = 2048)
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     private User createdByUser;

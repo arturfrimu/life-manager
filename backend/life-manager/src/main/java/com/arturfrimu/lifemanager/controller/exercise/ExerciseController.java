@@ -36,6 +36,7 @@ public class ExerciseController {
                         exercise.getName(),
                         exercise.getType(),
                         exercise.getDescription(),
+                        exercise.getImageUrl(),
                         exercise.getCreatedByUser() != null ? exercise.getCreatedByUser().getId() : null,
                         exercise.getCreated(),
                         exercise.getUpdated()
