@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: life_manager
     volumes:
-      - ./backend/life-manager-backend/infrastructure/databases/lifemanager:/docker-entrypoint-initdb.d:ro
+      - ./backend/life-manager/infrastructure/databases/lifemanager:/docker-entrypoint-initdb.d:ro
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
     healthcheck:
@@ -15,6 +16,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      - life-manager-network
 
   life-manager-minio:
     image: minio/minio:latest
@@ -33,6 +36,39 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      - life-manager-network
+
+  life-manager-app:
+    build:
+      context: ./backend/life-manager
+      dockerfile: Dockerfile
+    container_name: life-manager-app
+    environment:
+      POSTGRES_HOST: life-manager-postgres
+      POSTGRES_PORT: 5432
+      MINIO_ENDPOINT: http://life-manager-minio:9000
+      MINIO_ACCESS_KEY: minio_admin
+      MINIO_SECRET_KEY: minio_admin
+      MINIO_BUCKET_NAME: life-manager
+      MINIO_AUTO_CREATE_BUCKET: "true"
+      SHOW_SQL: "false"
+      FORMAT_SQL: "false"
+      HIGHLIGHT_SQL: "false"
+    ports:
+      - "8090:8090"
+    depends_on:
+      life-manager-postgres:
+        condition: service_healthy
+      life-manager-minio:
+        condition: service_healthy
+    networks:
+      - life-manager-network
 
 volumes:
+  postgres-data:
   minio-data:
+
+networks:
+  life-manager-network:
+    driver: bridge
