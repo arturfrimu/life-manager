@@ -1,0 +1,35 @@
+insert into life_manager."user" (id, username, email, created, updated, version) values (
+'11111111-1111-1111-1111-111111111111', 'john.doe', 'john.doe@gmail.com', current_timestamp, current_timestamp, 0
+);
+
+insert into life_manager.exercise (id, name, type, description, created_by_user_id, created, updated, version)
+values (gen_random_uuid(), 'Bench Press', 'Strength', 'Classic chest press using barbell.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Squat', 'Strength', 'Barbell squat focusing on legs and core.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Deadlift', 'Strength', 'Full body lift focusing on posterior chain.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Pull-Up', 'Bodyweight', 'Upper body pull exercise using bar.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Push-Up', 'Bodyweight', 'Chest and triceps exercise using body weight.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Overhead Press', 'Strength', 'Shoulder press using barbell or dumbbells.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Bicep Curl', 'Isolation', 'Arm exercise focusing on biceps.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Tricep Dips', 'Bodyweight', 'Triceps exercise using parallel bars or bench.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Lunges', 'Strength', 'Single-leg exercise improving balance and legs.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Plank', 'Core', 'Isometric core stability exercise.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Burpee', 'Cardio', 'Full-body exercise combining squat, push-up, and jump.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Running', 'Cardio', 'Endurance exercise improving cardiovascular capacity.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Cycling', 'Cardio', 'Leg endurance exercise performed on a bike.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Jump Rope', 'Cardio', 'Coordination and stamina exercise using a rope.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0),
+       (gen_random_uuid(), 'Mountain Climbers', 'Bodyweight', 'Dynamic core and cardio exercise.',
+        '11111111-1111-1111-1111-111111111111', current_timestamp, current_timestamp, 0);

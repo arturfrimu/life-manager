@@ -1,0 +1,19 @@
+package com.arturfrimu.lifemanager.shared;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Getter
+@Setter
+@Component
+@ConfigurationProperties(prefix = "minio")
+public class MinioProperties {
+    String endpoint;
+    String accessKey;
+    String secretKey;
+    String bucket;
+    boolean autoCreateBucket;
+}
+
