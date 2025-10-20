@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.controller;
+package com.arturfrimu.lifemanager.controller.exercise;
 
 import com.arturfrimu.lifemanager.repository.ExerciseRepository;
 import com.arturfrimu.lifemanager.shared.ExercisePageResponse;
