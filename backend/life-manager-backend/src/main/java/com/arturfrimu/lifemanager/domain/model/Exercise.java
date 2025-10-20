@@ -11,7 +11,6 @@ public record Exercise(
         String name,
         Type type,
         String description,
-        List<Image> images,
         Instant created,
         Instant updated
 ) {
@@ -24,7 +23,6 @@ public record Exercise(
                 name.trim(),
                 type,
                 description,
-                List.of(),
                 null,
                 null
         );

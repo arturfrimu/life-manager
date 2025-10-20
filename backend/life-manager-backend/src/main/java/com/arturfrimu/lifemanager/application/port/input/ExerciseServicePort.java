@@ -4,9 +4,7 @@ import com.arturfrimu.lifemanager.domain.model.Exercise;
 import com.arturfrimu.lifemanager.domain.model.Type;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface ExerciseServicePort {
@@ -19,7 +17,5 @@ public interface ExerciseServicePort {
     void deleteExercise(UUID id);
 
     Exercise updateExercise(UUID id, String name, Type type, String description);
-
-    List<String> uploadExerciseImages(UUID exerciseId, List<MultipartFile> images);
 }
 

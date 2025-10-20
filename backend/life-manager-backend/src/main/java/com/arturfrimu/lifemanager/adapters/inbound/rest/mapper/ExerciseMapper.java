@@ -15,7 +15,6 @@ import java.util.List;
 public interface ExerciseMapper {
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "images", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "updated", ignore = true)
     Exercise toDomain(CreateExerciseRequest request);
