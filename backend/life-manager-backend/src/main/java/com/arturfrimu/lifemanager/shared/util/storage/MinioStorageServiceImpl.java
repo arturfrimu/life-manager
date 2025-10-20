@@ -33,23 +33,17 @@ public class MinioStorageServiceImpl implements MinioStorageService {
 
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(minioProperties.getBucketName())
+                            .bucket(minioProperties.getBucket())
                             .object(objectName)
                             .stream(stream, size, -1)
                             .contentType(fileContentType)
                             .build()
             );
 
-            var fileUrl = getFileUrl(objectName);
             log.info("Successfully uploaded file: {} to MinIO", objectName);
             
             return UploadedFileInfo.builder()
-                    .fileName(filename)
-                    .objectKey(objectName)
-                    .bucketName(minioProperties.getBucketName())
-                    .url(fileUrl)
-                    .contentType(fileContentType)
-                    .size(size)
+                    .presignedUrl(objectName)
                     .build();
         } catch (Exception e) {
             log.error("Failed to upload file: {} to MinIO", filename, e);
@@ -81,7 +75,7 @@ public class MinioStorageServiceImpl implements MinioStorageService {
         try {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(minioProperties.getBucketName())
+                            .bucket(minioProperties.getBucket())
                             .object(objectName)
                             .build()
             );
@@ -96,7 +90,7 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     public String getFileUrl(String objectName) {
         return "%s/%s%s".formatted(
                 minioProperties.getEndpoint(),
-                minioProperties.getBucketName(),
+                minioProperties.getBucket(),
                 objectName
         );
     }
@@ -105,7 +99,7 @@ public class MinioStorageServiceImpl implements MinioStorageService {
     public byte[] downloadFile(String objectKey) {
         try (var stream = minioClient.getObject(
                 GetObjectArgs.builder()
-                        .bucket(minioProperties.getBucketName())
+                        .bucket(minioProperties.getBucket())
                         .object(objectKey)
                         .build()
         )) {

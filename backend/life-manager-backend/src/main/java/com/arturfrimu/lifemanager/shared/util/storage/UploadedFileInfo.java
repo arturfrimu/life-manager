@@ -4,10 +4,5 @@ import lombok.Builder;
 
 @Builder
 public record UploadedFileInfo(
-        String fileName,
-        String objectKey,
-        String bucketName,
-        String url,
-        String contentType,
-        Long size
+        String presignedUrl
 ) {}

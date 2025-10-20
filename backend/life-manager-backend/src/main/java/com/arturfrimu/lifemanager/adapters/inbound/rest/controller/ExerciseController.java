@@ -102,12 +102,17 @@ public class ExerciseController {
     }
 
     @PatchMapping(value = "/{exerciseId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<String>> attachImage(
+    public ResponseEntity<Void> attachImage(
             @PathVariable UUID exerciseId,
             @RequestParam("images") List<MultipartFile> images
     ) {
         log.info("Received request to upload {} images for exercise with id: {}", images.size(), exerciseId);
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        exerciseServicePort.attachImage(exerciseId, images);
+
+        log.info("Successfully uploaded images for exercise with id: {}", exerciseId);
+
+        return ResponseEntity.noContent().build();
     }
 }
 

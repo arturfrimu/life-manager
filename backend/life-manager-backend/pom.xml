@@ -11,11 +11,11 @@
     </parent>
 
     <groupId>com.arturfrimu</groupId>
-    <artifactId>life-manager-backend</artifactId>
+    <artifactId>life-manager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>life-manager-backend</name>
-    <description>life-manager-backend</description>
+    <name>life-manager</name>
+    <description>life-manager</description>
 
     <properties>
         <java.version>24</java.version>

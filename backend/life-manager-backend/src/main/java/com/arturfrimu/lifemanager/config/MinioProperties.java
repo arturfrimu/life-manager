@@ -13,7 +13,7 @@ public class MinioProperties {
     String endpoint;
     String accessKey;
     String secretKey;
-    String bucketName;
+    String bucket;
     boolean autoCreateBucket;
 }
 

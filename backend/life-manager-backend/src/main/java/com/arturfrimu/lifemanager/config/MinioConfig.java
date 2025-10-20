@@ -29,19 +29,19 @@ public class MinioConfig {
             if (minioProperties.isAutoCreateBucket()) {
                 var bucketExists = client.bucketExists(
                         BucketExistsArgs.builder()
-                                .bucket(minioProperties.getBucketName())
+                                .bucket(minioProperties.getBucket())
                                 .build()
                 );
 
                 if (!bucketExists) {
                     client.makeBucket(
                             MakeBucketArgs.builder()
-                                    .bucket(minioProperties.getBucketName())
+                                    .bucket(minioProperties.getBucket())
                                     .build()
                     );
-                    log.info("Created MinIO bucket: {}", minioProperties.getBucketName());
+                    log.info("Created MinIO bucket: {}", minioProperties.getBucket());
                 } else {
-                    log.info("MinIO bucket already exists: {}", minioProperties.getBucketName());
+                    log.info("MinIO bucket already exists: {}", minioProperties.getBucket());
                 }
             }
 
