@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
 
-@SpringBootApplication(scanBasePackages = "com.arturfrimu.lifemanager")
+@SpringBootApplication
 public class LifeManagerApplication {
     public static void main(String[] args) {
         SpringApplication.run(LifeManagerApplication.class, args);

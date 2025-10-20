@@ -1,6 +1,7 @@
-package com.arturfrimu.lifemanager.shared.exception;
+package com.arturfrimu.lifemanager.shared.util.storage;
 
 import com.arturfrimu.lifemanager.config.ErrorStorageProperties;
+import com.arturfrimu.lifemanager.shared.exception.ErrorEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;

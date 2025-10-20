@@ -1,6 +1,6 @@
-package com.arturfrimu.lifemanager.shared.exception;
+package com.arturfrimu.lifemanager.shared.util.storage;
 
-import com.arturfrimu.lifemanager.shared.util.storage.MinioStorageService;
+import com.arturfrimu.lifemanager.shared.exception.ErrorEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

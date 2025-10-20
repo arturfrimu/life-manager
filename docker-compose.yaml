@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: life_manager
     volumes:
-      - ./infrastructure/databases/lifemanager:/docker-entrypoint-initdb.d:ro
+      - ./backend/life-manager-backend/infrastructure/databases/lifemanager:/docker-entrypoint-initdb.d:ro
     ports:
       - "5434:5432"
     healthcheck:

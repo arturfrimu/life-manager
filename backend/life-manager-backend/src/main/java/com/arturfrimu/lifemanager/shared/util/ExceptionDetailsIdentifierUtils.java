@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.shared.exception;
+package com.arturfrimu.lifemanager.shared.util;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.dao.DataAccessException;

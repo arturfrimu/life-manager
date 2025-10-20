@@ -1,5 +1,7 @@
 package com.arturfrimu.lifemanager.shared.exception;
 
+import com.arturfrimu.lifemanager.shared.util.ExceptionDetailsIdentifierUtils;
+import com.arturfrimu.lifemanager.shared.util.storage.MinioErrorEventStorage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
