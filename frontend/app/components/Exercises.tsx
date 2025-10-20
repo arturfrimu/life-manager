@@ -5,13 +5,13 @@ interface Props {
 }
 
 const Exercises = ({ exercises }: Props) => {
-    console.log(exercises)
   return (
     <div>
         <Heading>Exercises</Heading>
         {exercises.map(exercises => (
             <>
                 <div key={exercises.id}>
+                    <img src={exercises.imageUrl} alt={exercises.name} />
                     <p>{exercises.name}</p>
                     <p>{exercises.description}</p>
                 </div>

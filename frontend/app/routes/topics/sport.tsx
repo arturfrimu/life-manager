@@ -21,7 +21,7 @@ const Sport = () => {
 };
 
 export const loader = async () => {
-  const response = await fetch("http://localhost:8090/api/v1/exercises?page=0&size=2&sort=name,asc");
+  const response = await fetch("http://localhost:8090/api/v1/exercises?page=0&size=10&sort=name,asc");
   const data = await response.json();
 
   return {
