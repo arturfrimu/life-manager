@@ -1,4 +1,4 @@
-package com.arturfrimu.lifemanager.shared;
+package com.arturfrimu.lifemanager.controller.exercise;
 
 import java.time.Instant;
 import java.util.UUID;

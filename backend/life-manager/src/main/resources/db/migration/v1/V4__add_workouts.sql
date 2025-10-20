@@ -1,0 +1,4 @@
+insert into life_manager.workout_session (id, user_id, name, notes, started_at, completed_at, created, updated, version)
+values
+    (gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'Full Body Strength', 'Focus on compound lifts: squat, bench, deadlift.', current_timestamp - interval '2 hours', current_timestamp - interval '1 hour', current_timestamp, current_timestamp, 0),
+    (gen_random_uuid(), '11111111-1111-1111-1111-111111111111', 'Upper Body Push', 'Bench press, shoulder press, triceps dips.', current_timestamp - interval '1 day 3 hours', current_timestamp - interval '1 day 2 hours', current_timestamp, current_timestamp, 0);

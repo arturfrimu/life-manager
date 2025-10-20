@@ -1,8 +1,7 @@
 package com.arturfrimu.lifemanager.controller.exercise;
 
+import com.arturfrimu.lifemanager.controller.PageResponse;
 import com.arturfrimu.lifemanager.repository.ExerciseRepository;
-import com.arturfrimu.lifemanager.shared.ExercisePageResponse;
-import com.arturfrimu.lifemanager.shared.ExerciseResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +23,7 @@ public class ExerciseController {
     ExerciseRepository exerciseRepository;
 
     @GetMapping
-    public ResponseEntity<ExercisePageResponse> findAllExercises(
+    public ResponseEntity<PageResponse<ExerciseResponse>> findAllExercises(
             @PageableDefault(sort = "name") Pageable pageable
     ) {
         log.info("Received request to get exercises with page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -43,7 +42,7 @@ public class ExerciseController {
                 ))
                 .toList();
 
-        var response = new ExercisePageResponse(
+        var response = new PageResponse<>(
                 content,
                 exercisesPage.getNumber(),
                 exercisesPage.getSize(),
