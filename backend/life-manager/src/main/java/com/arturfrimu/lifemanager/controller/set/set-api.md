@@ -3,38 +3,23 @@
 ## Request
 
 ```http request
-GET http://localhost:8090/api/v1/set?page=1&size=2&sort=name,asc
+POST http://localhost:8090/api/v1/sets
 ```
 
 ## Response
 
 ```json
 {
-  "content": [
-    {
-      "id": "098aff4b-0a6e-4f43-9453-13db08c677bd",
-      "name": "Burpee",
-      "type": "Cardio",
-      "description": "Full-body exercise combining squat, push-up, and jump.",
-      "createdByUserId": "11111111-1111-1111-1111-111111111111",
-      "created": "2025-10-20T20:46:23.486600Z",
-      "updated": "2025-10-20T20:46:23.486600Z"
-    },
-    {
-      "id": "8b18fd8a-3be0-49e7-8253-46bef937759a",
-      "name": "Cycling",
-      "type": "Cardio",
-      "description": "Leg endurance exercise performed on a bike.",
-      "createdByUserId": "11111111-1111-1111-1111-111111111111",
-      "created": "2025-10-20T20:46:23.486600Z",
-      "updated": "2025-10-20T20:46:23.486600Z"
-    }
-  ],
-  "page": 1,
-  "size": 2,
-  "totalElements": 15,
-  "totalPages": 8,
-  "first": false,
-  "last": false
+  "id": "494fad8d-e5e4-4bb2-a132-a80f09ff98be",
+  "workoutExerciseId": "56964b54-0035-448c-9b47-68dbc05eeae6",
+  "setIndex": 3,
+  "reps": 12,
+  "weight": 80,
+  "durationSeconds": 60,
+  "distanceMeters": 60,
+  "completed": false,
+  "notes": "",
+  "created": "2025-10-20T23:48:55.638317Z",
+  "updated": "2025-10-20T23:48:55.638317Z"
 }
 ```
