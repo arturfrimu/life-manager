@@ -12,7 +12,7 @@ GET http://localhost:8090/api/v1/exercises?page=1&size=2&sort=name,asc
 {
   "content": [
     {
-      "id": "098aff4b-0a6e-4f43-9453-13db08c677bd",
+      "id": "{{EXERCISE_ID}}",
       "name": "Burpee",
       "type": "Cardio",
       "description": "Full-body exercise combining squat, push-up, and jump.",
@@ -21,7 +21,7 @@ GET http://localhost:8090/api/v1/exercises?page=1&size=2&sort=name,asc
       "updated": "2025-10-20T20:46:23.486600Z"
     },
     {
-      "id": "8b18fd8a-3be0-49e7-8253-46bef937759a",
+      "id": "{{EXERCISE_ID}}",
       "name": "Cycling",
       "type": "Cardio",
       "description": "Leg endurance exercise performed on a bike.",

@@ -4,16 +4,22 @@
 
 ```http request
 POST http://localhost:8090/api/v1/sets
+```
 
-
+```json
+{
+  "workoutExerciseId": "{{WORKOUT_EXERCISE_ID}}",
+  "reps": 10,
+  "weight": 100
+}
 ```
 
 ## Response
 
 ```json
 {
-  "id": "494fad8d-e5e4-4bb2-a132-a80f09ff98be",
-  "workoutExerciseId": "56964b54-0035-448c-9b47-68dbc05eeae6",
+  "id": "{{SET_ID}}",
+  "workoutExerciseId": "{{WORKOUT_EXERCISE_ID}}",
   "setIndex": 3,
   "reps": 12,
   "weight": 80,

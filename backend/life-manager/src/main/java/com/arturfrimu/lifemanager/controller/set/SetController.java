@@ -38,7 +38,6 @@ public class SetController {
         var workoutExercise = workoutExerciseRepository.findById(request.workoutExerciseId())
                 .orElseThrow(() -> new IllegalArgumentException("Workout exercise not found: " + request.workoutExerciseId()));
 
-        // Auto-calculate next setIndex
         var maxSetIndex = setRepository.findMaxSetIndexByWorkoutExerciseId(request.workoutExerciseId())
                 .orElse(-1);
         var nextSetIndex = maxSetIndex + 1;
