@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
+import java.math.BigDecimal;
 import java.util.UUID;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @RestController
@@ -100,6 +102,47 @@ public class SetController {
         );
 
         log.info("Successfully toggled set {} completed status from {} to {}", id, previousStatus, saved.getCompleted());
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/adjust-weight")
+    @Transactional
+    public ResponseEntity<SetResponse> adjustWeight(
+            @PathVariable UUID id,
+            @Valid @RequestBody AdjustWeightRequest request
+    ) {
+        log.info("Received request to adjust weight for set: {} by {}", id, request.weightAdjustment());
+
+        var set = setRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Set with id {} not found", id);
+                    return new ResponseStatusException(NOT_FOUND, "Set not found with id: " + id);
+                });
+
+        var currentWeight = set.getWeight() != null ? set.getWeight() : BigDecimal.ZERO;
+        var newWeight = currentWeight.add(request.weightAdjustment());
+
+        if (newWeight.compareTo(BigDecimal.ZERO) < 0) {
+            log.error("Attempted to set negative weight for set {}: {}", id, newWeight);
+            throw new ResponseStatusException(BAD_REQUEST, "Weight cannot be negative. Current weight: " + currentWeight + ", adjustment: " + request.weightAdjustment());
+        }
+
+        set.setWeight(newWeight);
+        var saved = setRepository.save(set);
+
+        var response = new SetResponse(
+                saved.getId(),
+                saved.getWorkoutExercise().getId(),
+                saved.getSetIndex(),
+                saved.getReps(),
+                saved.getWeight(),
+                saved.getCompleted(),
+                saved.getNotes(),
+                saved.getCreated(),
+                saved.getUpdated()
+        );
+
+        log.info("Successfully adjusted weight for set {} from {} to {}", id, currentWeight, newWeight);
         return ResponseEntity.ok(response);
     }
 }
