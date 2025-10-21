@@ -1,5 +1,7 @@
 import { Button, Container } from "@radix-ui/themes";
+import { useCallback } from "react";
 import { useLoaderData } from "react-router";
+import Counter from "~/components/Counter";
 import Exercises from "~/components/Exercises";
 
 const Workout = () => {
@@ -40,6 +42,30 @@ const Workout = () => {
     }
   }
 
+  const handleAdjustWeight =  useCallback(async (setId: string, weight: number) => {
+    console.log('ciao')
+    return;
+    try {
+        const response = await fetch(`http://localhost:8090/api/v1/sets/${setId}/adjust-weight`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                weightAdjustment: weight
+            })
+        });
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+  }, []);
+
+  const handelAdjustReps = async (setId: string, reps: number) => {
+
+  }
+
   return (
     <section>
         <Container>
@@ -52,8 +78,14 @@ const Workout = () => {
                                 <div>
                                     {exercise.sets.map(set => (
                                         <div key={set.id}>
-                                            <div>Weight: {set.weight}</div>
-                                            <div>Reps: {set.reps}</div>
+                                            <div>
+                                                <p>Weight: {set.weight}</p>
+                                                <Counter defaultValue={set.weight} onCounterUpdate={handleAdjustWeight.bind(null, set.id)} />
+                                            </div>
+                                            <div>
+                                                <p>Reps: {set.reps}</p>
+                                                <Counter defaultValue={set.reps} onCounterUpdate={handleAdjustWeight.bind(null, set.id)} />
+                                            </div>
                                             <div>
                                                 <input type="checkbox" onChange={handleSetComplete.bind(null, set.id)} checked={set.completed} />
                                             </div>
