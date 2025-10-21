@@ -172,5 +172,22 @@ public class WorkoutController {
         log.info("Successfully initialized workout with id: {} and name: {}", saved.getId(), saved.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteWorkout(@PathVariable UUID id) {
+        log.info("Received request to delete workout with id: {}", id);
+
+        var workout = workoutSessionRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Workout with id {} not found", id);
+                    return new ResponseStatusException(NOT_FOUND, "Workout not found with id: " + id);
+                });
+
+        workoutSessionRepository.delete(workout);
+
+        log.info("Successfully deleted workout with id: {}", id);
+        return ResponseEntity.noContent().build();
+    }
 }
 
