@@ -1,8 +1,12 @@
-# Find workout-exercise with pagination
+# Workout Exercise API
 
-## Request
+## Create Workout Exercise
 
-```
+Adds an exercise to a workout session. The order index is automatically calculated based on existing exercises in the workout.
+
+### Request
+
+```http request
 POST http://localhost:8090/api/v1/workout-exercises
 Content-Type: application/json
 ```
@@ -15,7 +19,13 @@ Content-Type: application/json
 }
 ```
 
-## Response
+### Request Fields
+
+- `workoutSessionId` (required) - ID of the workout session
+- `exerciseId` (required) - ID of the exercise to add
+- `notes` (optional) - Additional notes for this exercise in the workout
+
+### Response
 
 ```json
 {
@@ -28,3 +38,9 @@ Content-Type: application/json
   "updated": "2025-10-20T23:21:40.516966Z"
 }
 ```
+
+### Notes
+
+- The `orderIndex` is **automatically calculated** based on existing exercises in the workout
+- If no exercises exist, `orderIndex` starts at 0
+- Each new exercise gets the next sequential index

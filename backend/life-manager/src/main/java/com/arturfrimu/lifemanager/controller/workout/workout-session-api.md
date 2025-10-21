@@ -1,12 +1,22 @@
-# Find workout-sessions with pagination
+# Workout Session API
 
-## Request
+## Get All Workout Sessions (with pagination)
+
+Retrieves a paginated list of all workout sessions with basic information.
+
+### Request
 
 ```http request
-GET http://localhost:8090/api/v1/workouts?page=0&sort=name,asc
+GET http://localhost:8090/api/v1/workouts?page=0&size=10&sort=name,asc
 ```
 
-## Response
+### Query Parameters
+
+- `page` (optional) - Page number (default: 0)
+- `size` (optional) - Page size (default: 20)
+- `sort` (optional) - Sort field and direction, e.g., `name,asc`, `startedAt,desc`, `created,desc`
+
+### Response
 
 ```json
 {
@@ -41,15 +51,19 @@ GET http://localhost:8090/api/v1/workouts?page=0&sort=name,asc
 }
 ```
 
-# Find workout-sessions by id
+---
 
-## Request
+## Get Workout Session Details by ID
+
+Retrieves complete workout session details including all exercises and sets. This endpoint uses optimized JOIN FETCH queries to load all related data efficiently.
+
+### Request
 
 ```http request
-GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
+GET http://localhost:8090/api/v1/workouts/{{WORKOUT_ID}}
 ```
 
-## Response
+### Response
 
 ```json
 {
@@ -77,7 +91,7 @@ GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
     },
     {
       "id": "{{WORKOUT_EXERCISE_ID}}",
-      "orderIndex": 2,
+      "orderIndex": 1,
       "notes": "Your notes here...",
       "exercise": {
         "id": "{{EXERCISE_ID}}",
@@ -92,7 +106,7 @@ GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
             "reps": 12,
             "weight": 80.00,
             "completed": false,
-            "notes": "",
+            "notes": null,
             "created": "2025-10-20T23:32:37.389943Z",
             "updated": "2025-10-20T23:32:37.389943Z"
           },
@@ -102,7 +116,7 @@ GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
             "reps": 12,
             "weight": 80.00,
             "completed": false,
-            "notes": "",
+            "notes": null,
             "created": "2025-10-20T23:33:07.330672Z",
             "updated": "2025-10-20T23:33:07.330672Z"
           },
@@ -112,7 +126,7 @@ GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
             "reps": 12,
             "weight": 80.00,
             "completed": false,
-            "notes": "",
+            "notes": null,
             "created": "2025-10-20T23:33:12.035331Z",
             "updated": "2025-10-20T23:33:12.035331Z"
           }
@@ -127,3 +141,13 @@ GET http://localhost:8090/api/v1/workouts/4819a345-7149-4d28-a510-7da99366c48b
 }
 ```
 
+### Performance
+
+- Uses **2 optimized database queries** (not N+1)
+- Fetches workout with exercises in first query
+- Fetches all sets in second query
+- All data is eagerly loaded and returned in a single response
+
+### Error Responses
+
+- `404 NOT FOUND` - Workout session with the specified ID does not exist
