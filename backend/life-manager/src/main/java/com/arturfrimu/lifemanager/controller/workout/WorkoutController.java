@@ -1,6 +1,8 @@
 package com.arturfrimu.lifemanager.controller.workout;
 
 import com.arturfrimu.lifemanager.controller.PageResponse;
+import com.arturfrimu.lifemanager.entity.WorkoutSession;
+import com.arturfrimu.lifemanager.repository.UserRepository;
 import com.arturfrimu.lifemanager.repository.WorkoutSessionRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +10,16 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -26,6 +31,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WorkoutController {
 
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+    UserRepository userRepository;
     WorkoutSessionRepository workoutSessionRepository;
 
     @GetMapping
@@ -126,6 +133,43 @@ public class WorkoutController {
 
         log.info("Successfully retrieved workout details for id: {}", id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<WorkoutSessionResponse> initializeWorkout() {
+        log.info("Received request to initialize new workout");
+
+        var now = Instant.now();
+        var workoutName = FORMATTER.format(now);
+
+        var user = userRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user found"));
+
+        var workout = WorkoutSession.builder()
+                .id(UUID.randomUUID())
+                .user(user)
+                .name(workoutName)
+                .startedAt(now)
+                .workoutExercises(List.of())
+                .build();
+
+        var saved = workoutSessionRepository.save(workout);
+
+        var response = new WorkoutSessionResponse(
+                saved.getId(),
+                saved.getUser().getId(),
+                saved.getName(),
+                saved.getNotes(),
+                saved.getStartedAt(),
+                saved.getCompletedAt(),
+                saved.getCreated(),
+                saved.getUpdated()
+        );
+
+        log.info("Successfully initialized workout with id: {} and name: {}", saved.getId(), saved.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
 

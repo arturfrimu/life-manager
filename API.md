@@ -57,6 +57,42 @@ GET http://localhost:8090/api/v1/exercises?page=1&size=2&sort=name,asc
 
 # Workout Session API
 
+## Initialize Workout
+
+Creates a new empty workout session with current date and time as the name.
+
+### Request
+
+```http request
+POST http://localhost:8090/api/v1/workouts
+```
+
+No request body required.
+
+### Response
+
+```json
+{
+  "id": "{{WORKOUT_ID}}",
+  "userId": "11111111-1111-1111-1111-111111111111",
+  "name": "2025-10-21 17:30:45",
+  "notes": null,
+  "startedAt": "2025-10-21T15:30:45.123456Z",
+  "completedAt": null,
+  "created": "2025-10-21T15:30:45.123456Z",
+  "updated": "2025-10-21T15:30:45.123456Z"
+}
+```
+
+### Notes
+
+- The workout name is automatically generated using format: `yyyy-MM-dd HH:mm:ss`
+- The `startedAt` field is set to current timestamp
+- The workout is created empty (no exercises)
+- Uses the first available user from the database
+
+---
+
 ## Get All Workout Sessions (with pagination)
 
 Retrieves a paginated list of all workout sessions with basic information.
