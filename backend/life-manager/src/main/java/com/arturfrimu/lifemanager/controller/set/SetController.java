@@ -38,14 +38,21 @@ public class SetController {
         var workoutExercise = workoutExerciseRepository.findById(request.workoutExerciseId())
                 .orElseThrow(() -> new IllegalArgumentException("Workout exercise not found: " + request.workoutExerciseId()));
 
+        // Auto-calculate next setIndex
+        var maxSetIndex = setRepository.findMaxSetIndexByWorkoutExerciseId(request.workoutExerciseId())
+                .orElse(-1);
+        var nextSetIndex = maxSetIndex + 1;
+
+        log.info("Calculated next set index: {} for workout exercise: {}", nextSetIndex, request.workoutExerciseId());
+
         var set = Set.builder()
                 .id(UUID.randomUUID())
                 .workoutExercise(workoutExercise)
-                .setIndex(request.setIndex())
+                .setIndex(nextSetIndex)
                 .reps(request.reps())
                 .weight(request.weight())
-                .completed(request.completed())
-                .notes(request.notes())
+                .completed(false)
+                .notes(null)
                 .build();
 
         var saved = setRepository.save(set);

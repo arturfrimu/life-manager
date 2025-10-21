@@ -8,11 +8,8 @@ import java.util.UUID;
 public record CreateSetRequest(
         @NotNull(message = "Workout exercise ID is required")
         UUID workoutExerciseId,
-        Integer setIndex,
         @NotNull(message = "Reps is required")
         Integer reps,
         @NotNull(message = "Weight is required")
-        BigDecimal weight,
-        Boolean completed,
-        String notes
+        BigDecimal weight
 ) {}
