@@ -2,18 +2,14 @@ package com.arturfrimu.lifemanager.adapters.outbound.minio.adapter;
 
 import com.arturfrimu.lifemanager.config.MinioProperties;
 import com.arturfrimu.lifemanager.domain.port.output.FileStoragePort;
-import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

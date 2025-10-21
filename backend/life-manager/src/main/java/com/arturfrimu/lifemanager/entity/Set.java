@@ -39,12 +39,6 @@ public class Set extends BaseEntity {
     @Column(name = "weight", precision = 10, scale = 2)
     private BigDecimal weight;
 
-    @Column(name = "duration_seconds")
-    private Integer durationSeconds;
-
-    @Column(name = "distance_meters", precision = 10, scale = 2)
-    private BigDecimal distanceMeters;
-
     @Column(name = "completed", nullable = false)
     private Boolean completed;
 

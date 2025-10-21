@@ -10,8 +10,6 @@ public record SetResponse(
         Integer setIndex,
         Integer reps,
         BigDecimal weight,
-        Integer durationSeconds,
-        BigDecimal distanceMeters,
         Boolean completed,
         String notes,
         Instant created,

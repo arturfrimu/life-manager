@@ -13,8 +13,6 @@ public record CreateSetRequest(
         Integer reps,
         @NotNull(message = "Weight is required")
         BigDecimal weight,
-        Integer durationSeconds,
-        BigDecimal distanceMeters,
         Boolean completed,
         String notes
 ) {}

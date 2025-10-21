@@ -44,8 +44,6 @@ public class SetController {
                 .setIndex(request.setIndex())
                 .reps(request.reps())
                 .weight(request.weight())
-                .durationSeconds(request.durationSeconds())
-                .distanceMeters(request.distanceMeters())
                 .completed(request.completed())
                 .notes(request.notes())
                 .build();
@@ -58,8 +56,6 @@ public class SetController {
                 saved.getSetIndex(),
                 saved.getReps(),
                 saved.getWeight(),
-                saved.getDurationSeconds(),
-                saved.getDistanceMeters(),
                 saved.getCompleted(),
                 saved.getNotes(),
                 saved.getCreated(),

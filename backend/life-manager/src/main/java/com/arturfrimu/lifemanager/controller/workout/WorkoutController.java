@@ -83,8 +83,6 @@ public class WorkoutController {
                                     set.getSetIndex(),
                                     set.getReps(),
                                     set.getWeight(),
-                                    set.getDurationSeconds(),
-                                    set.getDistanceMeters(),
                                     set.getCompleted(),
                                     set.getNotes(),
                                     set.getCreated(),

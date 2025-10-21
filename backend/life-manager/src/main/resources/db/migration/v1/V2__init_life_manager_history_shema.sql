@@ -82,8 +82,6 @@ create table life_manager_history.set_history
     set_index            int                      not null,
     reps                 int,
     weight               numeric(10, 2),
-    duration_seconds     int,
-    distance_meters      numeric(10, 2),
     completed            boolean                  not null,
     notes                text,
     created              timestamp with time zone not null,
