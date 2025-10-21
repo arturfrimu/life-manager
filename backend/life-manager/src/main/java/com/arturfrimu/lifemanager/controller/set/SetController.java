@@ -11,10 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.util.UUID;
 
@@ -70,5 +70,36 @@ public class SetController {
 
         log.info("Successfully created set with id: {} and set index: {}", saved.getId(), saved.getSetIndex());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{id}/toggle-completed")
+    @Transactional
+    public ResponseEntity<SetResponse> toggleCompleted(@PathVariable UUID id) {
+        log.info("Received request to toggle completed status for set: {}", id);
+
+        var set = setRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Set with id {} not found", id);
+                    return new ResponseStatusException(NOT_FOUND, "Set not found with id: " + id);
+                });
+
+        var previousStatus = set.getCompleted();
+        set.setCompleted(!previousStatus);
+        var saved = setRepository.save(set);
+
+        var response = new SetResponse(
+                saved.getId(),
+                saved.getWorkoutExercise().getId(),
+                saved.getSetIndex(),
+                saved.getReps(),
+                saved.getWeight(),
+                saved.getCompleted(),
+                saved.getNotes(),
+                saved.getCreated(),
+                saved.getUpdated()
+        );
+
+        log.info("Successfully toggled set {} completed status from {} to {}", id, previousStatus, saved.getCompleted());
+        return ResponseEntity.ok(response);
     }
 }
