@@ -3,6 +3,13 @@ package com.arturfrimu.lifemanager.controller.set;
 import com.arturfrimu.lifemanager.entity.Set;
 import com.arturfrimu.lifemanager.repository.SetRepository;
 import com.arturfrimu.lifemanager.repository.WorkoutExerciseRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +32,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("/api/v1/sets")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Sets", description = "API for managing exercise sets within workout sessions")
 public class SetController {
 
     SetRepository setRepository;
@@ -32,6 +40,22 @@ public class SetController {
 
     @PostMapping
     @Transactional
+    @Operation(
+            summary = "Create a new set",
+            description = "Creates a new set for a workout exercise. The setIndex is automatically calculated based on existing sets. The set is created with completed=false by default."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Set created successfully",
+                    content = @Content(schema = @Schema(implementation = SetResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request - workout exercise not found",
+                    content = @Content
+            )
+    })
     public ResponseEntity<SetResponse> createSet(
             @Valid @RequestBody CreateSetRequest request
     ) {
@@ -76,7 +100,26 @@ public class SetController {
 
     @PatchMapping("/{id}/toggle-completed")
     @Transactional
-    public ResponseEntity<SetResponse> toggleCompleted(@PathVariable UUID id) {
+    @Operation(
+            summary = "Toggle set completion status",
+            description = "Toggles the completed status of a set. If false, becomes true and vice versa."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Set completion status toggled successfully",
+                    content = @Content(schema = @Schema(implementation = SetResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Set not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<SetResponse> toggleCompleted(
+            @Parameter(description = "ID of the set to toggle completion status") 
+            @PathVariable UUID id
+    ) {
         log.info("Received request to toggle completed status for set: {}", id);
 
         var set = setRepository.findById(id)
@@ -107,7 +150,29 @@ public class SetController {
 
     @PatchMapping("/{id}/adjust-weight")
     @Transactional
+    @Operation(
+            summary = "Adjust set weight",
+            description = "Adjusts the weight of a set by adding the specified adjustment value. Supports positive values (increase) and negative values (decrease). The resulting weight cannot be negative."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Weight adjusted successfully",
+                    content = @Content(schema = @Schema(implementation = SetResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid adjustment - resulting weight would be negative",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Set not found",
+                    content = @Content
+            )
+    })
     public ResponseEntity<SetResponse> adjustWeight(
+            @Parameter(description = "ID of the set to adjust weight") 
             @PathVariable UUID id,
             @Valid @RequestBody AdjustWeightRequest request
     ) {
