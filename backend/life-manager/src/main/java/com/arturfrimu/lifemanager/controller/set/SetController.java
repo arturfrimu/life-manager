@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+@CrossOrigin("*")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/sets")
