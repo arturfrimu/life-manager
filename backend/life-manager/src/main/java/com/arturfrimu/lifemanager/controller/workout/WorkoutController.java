@@ -2,13 +2,6 @@ package com.arturfrimu.lifemanager.controller.workout;
 
 import com.arturfrimu.lifemanager.controller.PageResponse;
 import com.arturfrimu.lifemanager.repository.WorkoutSessionRepository;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,25 +24,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("/api/v1/workouts")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Workout Sessions", description = "API for managing workout sessions")
 public class WorkoutController {
 
     WorkoutSessionRepository workoutSessionRepository;
 
     @GetMapping
-    @Operation(
-            summary = "Get all workout sessions",
-            description = "Retrieves a paginated list of all workout sessions with basic information (without exercises and sets)"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved workout sessions",
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))
-            )
-    })
     public ResponseEntity<PageResponse<WorkoutSessionResponse>> findAllWorkouts(
-            @Parameter(description = "Pagination parameters (page, size, sort)") 
             @PageableDefault(sort = "name") Pageable pageable
     ) {
         log.info("Received request to get workouts with page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -83,26 +63,7 @@ public class WorkoutController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-            summary = "Get workout session details by ID",
-            description = "Retrieves complete workout session details including all exercises and their sets. Uses optimized JOIN FETCH queries (2 DB queries total) to efficiently load all related data."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved workout session details",
-                    content = @Content(schema = @Schema(implementation = WorkoutSessionDetailResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Workout session not found",
-                    content = @Content
-            )
-    })
-    public ResponseEntity<WorkoutSessionDetailResponse> findWorkoutById(
-            @Parameter(description = "ID of the workout session to retrieve") 
-            @PathVariable UUID id
-    ) {
+    public ResponseEntity<WorkoutSessionDetailResponse> findWorkoutById(@PathVariable UUID id) {
         log.info("Received request to get workout details for id: {}", id);
 
         var workout = workoutSessionRepository.findByIdWithExercises(id)

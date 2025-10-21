@@ -4,12 +4,6 @@ import com.arturfrimu.lifemanager.entity.WorkoutExercise;
 import com.arturfrimu.lifemanager.repository.ExerciseRepository;
 import com.arturfrimu.lifemanager.repository.WorkoutExerciseRepository;
 import com.arturfrimu.lifemanager.repository.WorkoutSessionRepository;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +24,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/workout-exercises")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Workout Exercises", description = "API for adding exercises to workout sessions")
 public class WorkoutExerciseController {
 
     ExerciseRepository exerciseRepository;
@@ -39,22 +32,6 @@ public class WorkoutExerciseController {
 
     @PostMapping
     @Transactional
-    @Operation(
-            summary = "Add exercise to workout session",
-            description = "Adds an exercise to a workout session. The orderIndex is automatically calculated based on existing exercises in the workout."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Exercise added to workout successfully",
-                    content = @Content(schema = @Schema(implementation = WorkoutExerciseResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request - workout session or exercise not found",
-                    content = @Content
-            )
-    })
     public ResponseEntity<WorkoutExerciseResponse> createWorkoutExercise(
             @Valid @RequestBody CreateWorkoutExerciseRequest request
     ) {
