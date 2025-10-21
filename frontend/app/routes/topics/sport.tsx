@@ -5,10 +5,25 @@ const Sport = () => {
   const { data } = useLoaderData();
   const workouts: Workout[] = data.content;
 
+  const handleAddWorkout = async () => {
+    try {
+      const response = await fetch('http://localhost:8090/api/v1/workouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <section>
       <Container>
-        <Button>New Workout</Button>
+        <Button onClick={handleAddWorkout}>New Workout</Button>
 
         <Table.Root>
           <Table.Header>
