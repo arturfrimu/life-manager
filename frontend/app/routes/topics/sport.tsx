@@ -1,29 +1,18 @@
 import { Button, Container, Table } from "@radix-ui/themes";
-import { useLoaderData } from "react-router";
+import { Form, redirect, useLoaderData, useNavigate } from "react-router";
 
 const Sport = () => {
   const { data } = useLoaderData();
+  const navigate = useNavigate();
+
   const workouts: Workout[] = data.content;
-
-  const handleAddWorkout = async () => {
-    try {
-      const response = await fetch('http://localhost:8090/api/v1/workouts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const data = await response.json();
-
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <section>
       <Container>
-        <Button onClick={handleAddWorkout}>New Workout</Button>
+        <Form method="post">
+          <Button type="submit">New Workout</Button>
+        </Form>
 
         <Table.Root>
           <Table.Header>
@@ -37,7 +26,7 @@ const Sport = () => {
 
           <Table.Body>
             {workouts.map((workout, idx) => (
-              <Table.Row key={workout.id}>
+              <Table.Row key={workout.id} onDoubleClick={() => navigate(`/sport/workouts/${workout.id}`)} className="cursor-pointer">
                 <Table.RowHeaderCell>{idx}</Table.RowHeaderCell>
                 <Table.Cell>{workout.name}</Table.Cell>
                 <Table.Cell>{workout.notes}</Table.Cell>
@@ -58,6 +47,17 @@ export const loader = async () => {
   return {
     data
   }
+}
+
+export const action = async () => {
+  const response = await fetch('http://localhost:8090/api/v1/workouts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const data = await response.json();
+
+  return redirect(`/sport/workouts/${data.id}`);
 }
 
 export default Sport;
